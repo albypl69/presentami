@@ -4,7 +4,7 @@ import logging
 import base64
 import json
 from options import parse_search_args
-from src.rewards import Rewards
+from src.goals import Goals
 from src.log import HistLog, StatsJsonLog
 from src.messengers import TelegramMessenger, DiscordMessenger, BaseMessenger
 from src.google_sheets_reporting import GoogleSheetsReporting
@@ -87,10 +87,10 @@ def get_google_sheets_reporting(config, args):
     return google_sheets_reporting
 
 
-def complete_search(rewards, completion, search_type, search_hist):
+def complete_search(goals, completion, search_type, search_hist):
     print(f"\nYou selected {search_type}")
     if not completion.is_search_type_completed(search_type):
-        rewards.complete_search_type(search_type, completion, search_hist)
+        goals.complete_search_type(search_type, completion, search_hist)
     else:
         print(f'{search_type.capitalize()} already completed\n')
 
@@ -138,26 +138,26 @@ def main():
     messengers: list[BaseMessenger] = [messenger for messenger in [
         telegram_messenger, discord_messenger] if messenger is not None]
     google_sheets_reporting = get_google_sheets_reporting(config, args)
-    rewards = Rewards(email, password, DEBUG, args.headless, args.cookies,
+    goals = Goals(email, password, DEBUG, args.headless, args.cookies,
                       args.driver, args.nosandbox, args.google_trends_geo, messengers)
 
     try:
-        complete_search(rewards, completion, args.search_type, search_hist)
-        hist_log.write(rewards.completion)
+        complete_search(goals, completion, args.search_type, search_hist)
+        hist_log.write(goals.completion)
         completion = hist_log.get_completion()
 
-        if hasattr(rewards, 'stats'):
-            formatted_stat_str = "; ".join(rewards.stats.stats_str)
+        if hasattr(goals, 'stats'):
+            formatted_stat_str = "; ".join(goals.stats.stats_str)
             stats_log.add_entry_and_write(formatted_stat_str, email)
 
             run_hist_str = hist_log.get_run_hist()[-1].split(': ')[1]
 
             for messenger in messengers:
                 messenger.send_reward_message(
-                    rewards.stats.stats_str, run_hist_str, email)
+                    goals.stats.stats_str, run_hist_str, email)
 
             if google_sheets_reporting:
-                google_sheets_reporting.add_row(rewards.stats, email)
+                google_sheets_reporting.add_row(goals.stats, email)
 
         # check again, log if any failed
         if not completion.is_search_type_completed(args.search_type):
@@ -167,13 +167,13 @@ def main():
                 filename=os.path.join(LOG_DIR, ERROR_LOG)
             )
             logging.debug(hist_log.get_timestamp())
-            for line in rewards.stdout:
+            for line in goals.stdout:
                 logging.debug(line)
             logging.debug("")
 
     except:  # catch *all* exceptions
         _log_hist_log(hist_log)
-        hist_log.write(rewards.completion)
+        hist_log.write(goals.completion)
 
         if len(messengers):
             # send error msg to telegram

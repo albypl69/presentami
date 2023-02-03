@@ -14,13 +14,13 @@ dir_run_from = os.getcwd()
 top_dir = os.path.dirname(sys.argv[0])
 if top_dir and top_dir != dir_run_from:
     os.chdir(top_dir)
-sys.path.append('MioControllo')
+sys.path.append('wasabi')
 from options import parse_setup_args
 
 CONFIG_DIR = 'config/'
 CONFIG_FILE = "config.json"
 CONFIG_FILE_PATH = os.path.join(CONFIG_DIR, CONFIG_FILE)
-DEPRECATED_CONFIG_FILE_PATH = os.path.join("MioControllo/src/config.py")
+DEPRECATED_CONFIG_FILE_PATH = os.path.join("wasabi/src/config.py")
 
 
 def __encode(s):
@@ -38,8 +38,8 @@ def __get_args(existing_credentials):
 
 def __prompt_simple_input(existing_credentials):
     new_credentials = existing_credentials.copy()
-    email = __encode(input("*MS Rewards Email: "))
-    password = __encode(getpass.getpass("*Password: "))
+    email = __encode(input("*wasabi goals email: "))
+    password = __encode(getpass.getpass("*password: "))
 
     new_credentials['email'] = email
     new_credentials['password'] = password

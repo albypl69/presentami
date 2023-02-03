@@ -36,7 +36,7 @@ class GoogleSheetsReporting():
                 try:
                     creds.refresh(Request())
                 except RefreshError as e:
-                    print(f'{e}\nError thrown when trying to refresh expired token. You will need to manually delete the token file: `rm MioControllo/config/google_sheets_token.json`')
+                    print(f'{e}\nError thrown when trying to refresh expired token. You will need to manually delete the token file: `rm wasabi/config/google_sheets_token.json`')
                     return
             else:
                 if os.path.exists(CREDENTIALS_PATH):

@@ -1,35 +1,49 @@
-FROM python:3.9.13-slim
+ARG VERSION=3.9-slim
+FROM python:$VERSION
 
+ARG COMMIT_SHA=main
+ARG CREATED=""
 
-COPY .git/ /Mio-Controllo/.git/
-COPY /MioControllo /Mio-Controllo/MioControllo
-COPY Mio.cron /etc/cron.d/Mio.cron
-COPY entry.sh script.sh update.sh /Mio-Controllo/
+# Fill in your labels as appropriate here
+LABEL \
+    org.opencontainers.image.created="$CREATED" \
+    org.opencontainers.image.revision=$COMMIT_SHA \
+    org.opencontainers.image.licenses=MIT \
+    org.opencontainers.image.ref.name=wasabi \
+    org.opencontainers.image.title="wasabi container" \
+    org.opencontainers.image.description="wasabi built into a container"
+
+# Set the SHELL option -o pipefail before RUN with a pipe in
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Installs google-chrome, chromedriver
 RUN set -ex \
     && apt-get update --no-install-recommends -y \
     && apt-get install --no-install-recommends -y  \
-    chromium \ 
-    git \ 
-    vim \
-    nano \
-    tzdata \
-    cron \
-    && rm -rf /var/lib/apt/lists/* \
-    && touch /var/log/cron.log \
-    && adduser --system nonroot \
-    && chown -R nonroot /Mio-Controllo \
-    && chmod 0777 /etc/cron.d/Mio.cron \
-    && chmod +x /Mio-Controllo/entry.sh \
-    && chmod +x /Mio-Controllo/update.sh \
-    && chmod u+s /usr/sbin/cron 	
+       chromium \
+       chromium-driver \ 
+    && rm -rf /var/lib/apt/lists/*
+
 # Set display port as an environment variable
 ENV DISPLAY=:99
-ENV PATH="/home/nonroot/.local/bin:${PATH}"
-ENV UPDATE="0 0 */1 * *"
-ENV SCH="0 */8 * * *"
-ENV TZ="America/New_York"
-SHELL ["/bin/bash", "-ec"]
-USER nonroot
-WORKDIR /Mio-Controllo/MioControllo
-ENTRYPOINT ["/bin/bash", "/Mio-Controllo/entry.sh"]
 
+# Create a user for wasabi
+RUN useradd -m nonroot
+RUN mkdir -p /home/nonroot
+WORKDIR /home/nonroot
+ENV PATH="/home/nonroot/.local/bin:${PATH}"
+
+# Copy wasabi folder
+COPY wasabi .
+
+COPY entrypoint.sh .
+RUN chmod +x ./entrypoint.sh
+
+# Now that the OS has been updated to include required packages, update ownership and then switch to nonroot user
+RUN chown -R nonroot:nonroot /home/nonroot
+
+USER nonroot
+# Install additional Python requirements
+RUN pip install --no-warn-script-location -r ./requirements.txt
+
+CMD [ "./entrypoint.sh" ]

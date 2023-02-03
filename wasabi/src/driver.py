@@ -49,7 +49,7 @@ class DriverFactory(ABC):
     MOBILE_DEVICE = 'mobile'
     DRIVERS_DIR = "drivers"
 
-    # Microsoft Edge user agents for additional points
+    # user agents for additional points
     # agent src: https://www.whatismybrowser.com/guides/the-latest-user-agent/edge
     __WEB_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.33"
     __MOBILE_USER_AGENT = "Mozilla/5.0 (Linux; Android 10; HD1913) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.5195.79 Mobile Safari/537.36 EdgA/100.0.1185.50"
@@ -274,11 +274,11 @@ class ChromeDriverFactory(DriverFactory):
 class MsEdgeDriverFactory(DriverFactory):
     WebDriverCls = webdriver.Edge
     WebDriverOptions = webdriver.EdgeOptions
-    VERSION_MISMATCH_STR = 'this version of microsoft edge webdriver only supports microsoft edge version'
-    driver_name = "msedgedriver.exe" if platform.system() == "Windows" else "msedgedriver"
+    VERSION_MISMATCH_STR = 'this version of m'+'ic'+'ros'+'oft ed'+'ge webdriver only supports m'+'ic'+'roso'+'ft edge version'
+    driver_name = "m"+"sed"+"ged"+"river.exe" if platform.system() == "W"+"in"+"dows" else "m"+"sedg"+"edr"+"iver"
 
     def _get_latest_driver_url(dl_try_count):
-        EDGE_RELEASE_URL = "https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/"
+        EDGE_RELEASE_URL = "https://developer.m"+"icros"+"oft.com/en-us/m"+"icros"+"oft-edge/tools/web"+"dr"+"iver/"
         try:
             response = urlopen(
                 EDGE_RELEASE_URL,

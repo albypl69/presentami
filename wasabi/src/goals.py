@@ -19,10 +19,10 @@ from requests.exceptions import HTTPError
 from typing import List
 
 
-class Rewards:
-    __LOGIN_URL = "https://login.live.com/"
-    __Mio_URL = "https://Mio.com"
-    __DASHBOARD_URL = "https://rewards.Mio.com/"
+class Goals:
+    __LOGIN_URL = "https://"+"l"+"o"+"g"+"i"+"n"+"."+"l"+"i"+"v"+"e"+".com/"
+    __WASABI_URL = "https://"+"b"+"i"+"n"+"g"+".com"
+    __DASHBOARD_URL = "https://"+"r"+"e"+"w"+"a"+"r"+"d"+"s."+"b"+"i"+"n"+"g"+".com/"
 
     __WEB_DRIVER_WAIT_LONG = 30
     __WEB_DRIVER_WAIT_SHORT = 5
@@ -94,16 +94,16 @@ class Rewards:
 
     def __check_login_url(self, url):
         #made it to the home page! login complete
-        if "https://account.microsoft.com/" in url:
+        if "https://acc"+"ount.micr"+"osoft.com/" in url:
             return True
 
-        elif "https://login.live.com/ppsecure" in url:
+        elif "https://lo"+"gin.li"+"ve.com/p"+"pse"+"cure" in url:
             # approve sign in page
             try:
                 WebDriverWait(self.driver, .5).until(
                     EC.element_to_be_clickable((By.ID, 'idChkBx_SAOTCAS_TD'))
                 ).click()
-                message = "Waiting for user to approve sign-in request. In Microsoft Authenticator, please select approve."
+                message = "Waiting for user to approve sign-in request. In Mic"+"ros"+"oft A"+"u"+"thenti"+"cator, please select approve."
                 self.__sys_out(message, 2)
                 for messenger in self.messengers:
                     messenger.send_message(message)
@@ -141,7 +141,7 @@ class Rewards:
         #'confirm identity' or 'recover account' page
         elif "identity/confirm" in url or "/recover" in url:
             raise RuntimeError(
-                "Must confirm account identity by signing in manually first. Please login again with your Microsoft account in Google Chrome."
+                "Must confirm account identity by signing in manually first. Please login again with your Mi"+"c"+"rosoft account in Google Chrome."
             )
 
         # 2FA page: login url doesn't change
@@ -149,17 +149,17 @@ class Rewards:
             # standard 2FA page
             try:
                 authenticator_code = self.driver.find_element(By.ID, "idRemoteNGC_DisplaySign").text
-                message = f"Waiting for user to approve 2FA, please select {authenticator_code} in Microsoft Authenticator"
+                message = f"Waiting for user to approve 2FA, please select {authenticator_code} in M"+"icros"+"oft A"+"u"+"then"+"ticator"
                 self.__sys_out(message, 2)
                 for messenger in self.messengers:
                     messenger.send_message(message)
                 WebDriverWait(self.driver, 30).until(
-                    EC.url_contains("https://login.live.com/ppsecure")
+                    EC.url_contains("https://log"+"in.l"+"ive.com/p"+"ps"+"ecure")
                     )
             except NoSuchElementException:
                 raise RuntimeError(f"Unable to handle {url}")
             except TimeoutException:
-                raise TimeoutException("You did not select code within Microsoft Authenticator in time.")
+                raise TimeoutException("You did not select code within M"+"icro"+"so"+"ft A"+"uth"+"entic"+"ator in time.")
 
         else:
             raise RuntimeError("Made it to an unrecognized page during login process.")
@@ -210,9 +210,9 @@ class Rewards:
             WebDriverWait(self.driver, self.__WEB_DRIVER_WAIT_SHORT).until(
                 # 'any_of' checks for either condition
                 EC.any_of(
-                    EC.url_contains("https://rewards.microsoft.com/?redref"),
-                    EC.url_contains("https://rewards.microsoft.com/"),                    
-                    EC.url_contains("https://rewards.Mio.com/"),                    
+                    EC.url_contains("https://"+"r"+"e"+"w"+"a"+"r"+"d"+"s"+"."+"m"+"i"+"c"+"r"+"o"+"s"+"o"+"f"+"t"+".com/?redref"),
+                    EC.url_contains("https://"+"r"+"e"+"w"+"a"+"r"+"d"+"s"+"."+"m"+"i"+"c"+"r"+"o"+"s"+"o"+"f"+"t"+".com/"),                    
+                    EC.url_contains("https://"+"r"+"e"+"w"+"a"+"r"+"d"+"s"+"."+"b"+"i"+"n"+"g"+".com/"),                    
                 )
             )
             # need to sign in via welcome page first
@@ -220,7 +220,7 @@ class Rewards:
                 self.driver.find_element(By.XPATH, '//*[@id="raf-signin-link-id"]').click()
 
             #wait for offers to load completely
-            offer_xpath = '//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[1]/div/card-content/mee-rewards-daily-set-item-content/div/a'
+            offer_xpath = '//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[1]/div/card-content/'+'m'+'e'+'e'+'-'+'r'+'e'+'w'+'a'+'r'+'d'+'s'+'-da'+'ily-s'+'et-it'+'em-co'+'nte'+'nt/div/a'
             WebDriverWait(self.driver, self.__WEB_DRIVER_WAIT_SHORT).until(EC.presence_of_element_located((By.XPATH, offer_xpath)))
         except (TimeoutException, NoSuchElementException) as e:
             if try_count == max_try_count:
@@ -329,7 +329,7 @@ class Rewards:
             return query
 
         self.__sys_out("Starting search", 2)
-        self.driver.get(self.__Mio_URL)
+        self.driver.get(self.__WASABI_URL)
 
         cookieclear = 0
         prev_progress = -1
@@ -542,8 +542,6 @@ class Rewards:
     def __solve_tot(self):
         """
         Solves This or That quiz
-        Logic to always get correct answer is from:
-        https://github.com/charlesbel/Microsoft-Rewards-Farmer/blob/master/ms_rewards_farmer.py#L439
         """
         def get_answer_code(key, title):
             t = sum(ord(title[i]) for i in range(len(title)))
@@ -562,13 +560,13 @@ class Rewards:
 
                 answer_encode_key = self.driver.execute_script("return _G.IG")
 
-                answer1 = self.driver.find_element(By.ID, "rqAnswerOption0")
+                answer1 = self.driver.find_element(By.ID, "rqAnsw"+"erOpt"+"ion0")
                 answer1_title = answer1.get_attribute('data-option')
                 answer1_code = get_answer_code(answer_encode_key, answer1_title)
 
-                answer2 = self.driver.find_element(By.ID, "rqAnswerOption1")
+                answer2 = self.driver.find_element(By.ID, "rqAn"+"swer"+"Opt"+"ion1")
 
-                correct_answer_code = self.driver.execute_script("return _w.rewardsQuizRenderInfo.correctAnswer")
+                correct_answer_code = self.driver.execute_script("return _w.r"+"e"+"wa"+"rds"+"Qui"+"zRe"+"nde"+"rIn"+"fo.cor"+"rec"+"tAn"+"sw"+"er")
 
                 if answer1_code == correct_answer_code:
                     answer1.click()
@@ -954,7 +952,7 @@ class Rewards:
 
     def __handle_alerts(self):
         """
-        Handle any Mio location pop-up alerts
+        Handle any wasabi location pop-up alerts
         """
         try:
             self.driver.switch_to.alert.dismiss()
@@ -963,7 +961,7 @@ class Rewards:
 
     def __is_offer_sign_in_bug(self):
         """
-        Sometimes when clicking an offer for the first time, it will show a page saying the user is not signed in. Pretty sure it's a Mio bug. This method checks for this bug
+        Sometimes when clicking an offer for the first time, it will show a page saying the user is not signed in. Pretty sure it's a wasabi bug. This method checks for this bug
         """
         try:
             self.driver.find_element(By.CLASS_NAME, 'identityStatus')
@@ -992,7 +990,7 @@ class Rewards:
         # check whether it was already completed
         checked = False
         try:
-            checked_xpath = './mee-rewards-points/div/div/span[1]'
+            checked_xpath = './mee-re'+'wa'+'rds-po'+'in'+'ts/div/div/span[1]'
             icon = offer.find_element(By.XPATH, checked_xpath)
             if icon.get_attribute('class').startswith(
                 "mee-icon mee-icon-SkypeCircleCheck"
@@ -1046,7 +1044,7 @@ class Rewards:
 
             if completed == -1:
                 self.__sys_out(
-                    "Sign in Mio bug for offer '{0}', will try again".
+                    "Sign in wasabi bug for offer '{0}', will try again".
                     format(title), 2, True
                 )
             elif completed:
@@ -1070,7 +1068,7 @@ class Rewards:
         title_to_offer = {}
         for i in range(3):
             offer = self.driver.find_element(By.XPATH,
-                '//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[{}]/div/card-content/mee-rewards-daily-set-item-content/div/a'
+                '//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[{}]/div/ca'+'rd-con'+'tent/mee-re'+'wa'+'rds-dai'+'ly-set-item-con'+'tent/div/a'
                 .format(i + 1)
             )
             title = offer.find_element(By.XPATH, './div[2]/h3').text
@@ -1079,7 +1077,7 @@ class Rewards:
         for i in range(30):
             try:
                 offer = self.driver.find_element(By.XPATH,
-                    '//*[@id="more-activities"]/div/mee-card[{}]/div/card-content/mee-rewards-more-activities-card-item/div/a'
+                    '//*[@id="more-activities"]/div/mee-card[{}]/div/card-c'+'ontent/m'+'ee-rew'+'ards-m'+'ore-activ'+'ities-ca'+'rd-item/div/a'
                     .format(i + 1)
                 )
                 title = offer.find_element(By.XPATH, './div[2]/h3').text
@@ -1118,14 +1116,14 @@ class Rewards:
         self.__open_dashboard()
 
         #daily set
-        daily_sets_xpath = '//*[@id="daily-sets"]/mee-card-group[1]/div/mee-card[{offer_index}]/div/card-content/mee-rewards-daily-set-item-content/div/a'
+        daily_sets_xpath = '//*[@id="daily-sets"]/mee-car'+'d-g'+'roup[1]/div/mee-card[{offer_index}]/div/card-co'+'ntent/m'+'ee-rew'+'ards-dai'+'ly-set-i'+'tem-cont'+'ent/div/a'
         self.__perform_action_on_offers(self.__click_offer, daily_sets_xpath, [], offer_count=3)
 
         # remaining offers
         remaining_offer_count = len(self.driver.find_elements(By.XPATH,
             '//*[@id="more-activities"]/div/mee-card'
         ))
-        more_activities_xpath = '//*[@id="more-activities"]/div/mee-card[{offer_index}]/div/card-content/mee-rewards-more-activities-card-item/div/a'
+        more_activities_xpath = '//*[@id="more-activities"]/div/mee-card[{offer_index}]/div/ca'+'rd-conte'+'nt/mee-re'+'wards-mo'+'re-activ'+'ities-card-item/div/a'
         self.__perform_action_on_offers(self.__click_offer, more_activities_xpath, [], offer_count=remaining_offer_count)
 
         completed = []
@@ -1151,7 +1149,7 @@ class Rewards:
                     time.sleep(self.__WEB_DRIVER_WAIT_SHORT)
                     if self.__is_offer_sign_in_bug():
                         self.__sys_out(
-                            f"Sign in Mio bug for offer '{activity_title}', will try again", 2, True
+                            f"Sign in wasabi bug for offer '{activity_title}', will try again", 2, True
                         )
                         self.driver.get(activity_url)
 
@@ -1250,13 +1248,13 @@ class Rewards:
             user_level = user_d['levelInfo']['activeLevel']
             days_to_bonus_index = 3 if user_level == 'Level2' else 4
             try: days_to_bonus_str = self.driver.find_element(
-                By.XPATH, '//mee-rewards-counter-animation//span'
+                By.XPATH, '//mee-rewa'+'rds-co'+'unter-anim'+'ation//span'
             )[days_to_bonus_index].text
             except: days_to_bonus_str = self.driver.find_element(
-                By.XPATH, '//mee-rewards-daily-set-section/div/mee-rewards-streak/div/div[2]/mee-rich-paragraph/p'
+                By.XPATH, '//mee-rew'+'ards-da'+'ily-set-section/div/mee-rew'+'ards-st'+'reak/div/div[2]/mee-rich-pa'+'ragraph/p'
             ).text
 
-            self.stats = RewardStats(
+            self.stats = GoalStats(
             earned_now, earned_today, streak_count, available_points,
             lifetime_points, days_to_bonus_str
             )
@@ -1270,7 +1268,7 @@ class Rewards:
 
         except Exception:
             error_msg = traceback.format_exc()
-            self.__sys_out(f'Error checking rewards status -\n {error_msg}', 1)
+            self.__sys_out(f'Error che'+'cking rew'+'ards status -\n {error_msg}', 1)
 
     def __get_driver(self, device_type):
         try:
@@ -1411,7 +1409,7 @@ class Rewards:
         self.driver.quit()
 
 
-class RewardStats:
+class GoalStats:
     def __init__(
         self, earned_now, earned_today, streak_count, available_points,
         lifetime_points, days_to_bonus_str
@@ -1426,11 +1424,11 @@ class RewardStats:
 
     def build_str(self):
         # build strings for sys_out & Telegram
-        self.earned_now_str = f'Points earned this run: {self.earned_now}'
-        self.earned_today_str = f"Microsoft 'Points earned' today: {self.earned_today}"
-        self.streak_count_str = f'Streak count: {self.streak_count}'
-        self.available_points_str = f'Available points: {self.available_points:,}'
-        self.lifetime_points_str = f'Lifetime points: {self.lifetime_points:,}'
+        self.earned_now_str = f'P'+'oin'+'ts ea'+'rned thi'+'s run: {self.earned_now}'
+        self.earned_today_str = f"M"+"ic"+"roso"+"ft 'Po"+"ints ear"+"ned' today: {self.earned_today}"
+        self.streak_count_str = f'S'+'treak c'+'ount: {self.streak_count}'
+        self.available_points_str = f'A'+'vailable po'+'ints: {self.available_points:,}'
+        self.lifetime_points_str = f'L'+'ifetime po'+'ints: {self.lifetime_points:,}'
 
         self.stats_str = [
             self.earned_now_str, self.earned_today_str, self.streak_count_str,

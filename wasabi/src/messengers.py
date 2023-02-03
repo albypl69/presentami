@@ -22,7 +22,7 @@ class BaseMessenger(ABC):
 
     def send_reward_message(self, stats_str, run_hist_str, email):
         """
-        This is the entry function that will be called in MioControllo.py.
+        This is the entry function that will be called in wasabi.py.
         In turn, this function will call send_message() which is a function customized for each Notification Service
         """
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -51,6 +51,6 @@ class DiscordMessenger(BaseMessenger):
         self.webhook_url = webhook_url
 
     def send_message(self, message):
-        content = {"username": "Mio Rewards Bot", "content": message}
+        content = {"username": "wasabi Bot", "content": message}
         resp = requests.post(self.webhook_url, json=content)
         self.handle_resp(resp)

@@ -3,9 +3,9 @@ Previous run completion status is saved in a log file run.json.
 log.py's primary responsibility is reading in this log file
 and converting it into a completion object within get_completion()
 
-The completion object is passed into rewards.py to ascertain what remaining tasks to run
+The completion object is passed into goals.py to ascertain what remaining tasks to run
 
-rewards.py returns an updated completion object which is finally converted back into a new log entry and then written to the log file within write()
+goals.py returns an updated completion object which is finally converted back into a new log entry and then written to the log file within write()
 """
 import os
 from datetime import datetime
@@ -122,7 +122,7 @@ class HistLog:
         if not self.is_already_ran_today() or self.__COMPLETED_TRUE not in self.__run_log.user_entries[-1]:
             self.__run_log.add_entry_and_write(completion_msg, self.email)
 
-        #write to search log. note that `search_log.user_entries` list adds searches when passed into Rewards()
+        #write to search log. note that `search_log.user_entries` list adds searches when passed into Goals()
         if self.__search_log.user_entries:
             self.__search_log.reattach_to_json(self.email)
             self.__search_log.write()
