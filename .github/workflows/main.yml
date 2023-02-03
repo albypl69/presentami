@@ -1,4 +1,4 @@
-name: BingRewards workflow
+name: MioControllo workflow
 on:
   schedule:
     - cron: "0 8,15 * * *" #Runs on the 5, and 10th hour UTC everyday
