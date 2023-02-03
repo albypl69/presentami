@@ -1,0 +1,80 @@
+name: BingRewards workflow
+on:
+  schedule:
+    - cron: "0 8,15 * * *" #Runs on the 5, and 10th hour UTC everyday
+  workflow_dispatch:
+jobs:
+  # ------------------------
+  DefineMatrix:
+    runs-on: ubuntu-20.04
+    outputs:
+      accounts: ${{ steps.get-accounts.outputs.IDs }}
+    steps:
+      - name: Checkout repo content
+        uses: actions/checkout@v2 # checkout the repository content to github runner.
+      - name: Get Accounts
+        id: get-accounts
+        run: |
+          echo $(echo ${{ secrets.MATRIX }} | base64 --decode) > originalData.json
+          echo ::set-output name=IDs::$(jq "[.[] | { the_id: .id }]" originalData.json)
+          rm -f originalData.json
+  # ------------------------
+  BingRewards:
+    runs-on: ubuntu-20.04
+    continue-on-error: true
+    needs:
+      - DefineMatrix
+    strategy:
+      matrix:
+        account: ${{ fromJSON(needs.DefineMatrix.outputs.accounts) }}
+    steps:
+      - name: Checkout repo content
+        uses: actions/checkout@v2 # checkout the repository content to github runner.
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9 #install the python needed
+
+      - name: Setup Google Chrome
+        run: bash MioControllo/installers/google-chrome.sh
+
+      - name: Install Requirements
+        run: | 
+          python -m pip install --upgrade pip
+          pip install -r MioControllo/requirements.txt
+      - name: Setup MioControllo
+        run: |
+          python MioControllo/setup.py \
+          -gssi ${{ secrets.GOOGLE_SHEETS_SHEET_ID }} \
+          -gstn ${{ secrets.GOOGLE_SHEETS_TAB_NAME }}
+        #  -ta   ${{ secrets.TELEGRAM_API_TOKEN }}     \
+        #  -tu   ${{ secrets.TELEGRAM_USERID }}        \
+
+      - name: Set Secrets
+        id: sets-secrets
+        run: |
+          echo ${{ matrix.account.the_id }}
+          echo $(echo ${{ secrets.MATRIX }} | base64 --decode) > originalData.json
+          
+          the_user=$(jq '.[] | select(.id=="${{ matrix.account.the_id }}") | .user' originalData.json)
+          the_pass=$(jq '.[] | select(.id=="${{ matrix.account.the_id }}") | .pass' originalData.json)
+          echo "::add-mask::$the_user"
+          echo "::add-mask::$the_pass"
+          echo "::set-output name=secret-user::$the_user"
+          echo "::set-output name=secret-pass::$the_pass"
+          rm -f originalData.json
+          unset the_user
+          unset the_pass
+          
+          # GOOGLE_SHEETS configuration
+          echo $(echo ${{ secrets.GOOGLE_SHEETS_CREDENTIALS_B64 }} | base64 --decode) > MioControllo/config/google_sheets_credentials.json
+          echo $(echo ${{ secrets.GOOGLE_SHEETS_TOKEN_B64 }} | base64 --decode) > MioControllo/config/google_sheets_token.json
+          
+      - name: Run BingRewards for Account ${{ matrix.account.the_id }}
+        run: |
+          python MioControllo/MioControllo.py -r -hl -nc -gs \
+          -e '${{ steps.sets-secrets.outputs.secret-user }}' \
+          -p '${{ steps.sets-secrets.outputs.secret-pass }}'
+          
+          # cleanup
