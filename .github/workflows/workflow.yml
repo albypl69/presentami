@@ -1,7 +1,7 @@
 name: wasabi GH
 on:
-  #schedule:
-  - cron: "0 8,15 * * *" #Runs on the 5, and 10th hour UTC everyday
+  schedule:
+    - cron: "0 8,15 * * *" #Runs on the 5, and 10th hour UTC everyday
   workflow_dispatch:
 jobs:
   # ------------------------
